@@ -1,46 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%    INSTITUTE OF PHYSICS PUBLISHING                                   %
-%                                                                      %
-%   `Preparing an article for publication in an Institute of Physics   %
-%    Publishing journal using LaTeX'                                   %
-%                                                                      %
-%    LaTeX source code `ioplau2e.tex' used to generate `author         %
-%    guidelines', the documentation explaining and demonstrating use   %
-%    of the Institute of Physics Publishing LaTeX preprint files       %
-%    `iopart.cls, iopart12.clo and iopart10.clo'.                      %
-%                                                                      %
-%    `ioplau2e.tex' itself uses LaTeX with `iopart.cls'                %
-%                                                                      %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%
-% First we have a character check
-%
-% ! exclamation mark    " double quote
-% # hash                ` opening quote (grave)
-% & ampersand           ' closing quote (acute)
-% $ dollar              % percent
-% ( open parenthesis    ) close paren.
-% - hyphen              = equals sign
-% | vertical bar        ~ tilde
-% @ at sign             _ underscore
-% { open curly brace    } close curly
-% [ open square         ] close square bracket
-% + plus sign           ; semi-colon
-% * asterisk            : colon
-% < open angle bracket  > close angle
-% , comma               . full stop
-% ? question mark       / forward slash
-% \ backslash           ^ circumflex
-%
-% ABCDEFGHIJKLMNOPQRSTUVWXYZ
-% abcdefghijklmnopqrstuvwxyz
-% 1234567890
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 \documentclass[12pt]{article}
-\newcommand{\gguide}{{\it Preparing graphics for IOP Publishing journals}}
 %Uncomment next line if AMS fonts required
 %\usepackage{iopams}
 \usepackage{graphicx}
@@ -57,8 +15,9 @@
 %%\note{A novel passive
 %%ferrofluid check (one-way) valve}
 
-\title{A Novel Passive Ferrofluid One-way (Check) Valve}
+\title{Pumping Ferrofluid With Only Liquid}
 
+\maketitle
 
 %%% first author
 \author{Robert L. Read}
@@ -186,6 +145,26 @@ from the source to the drain.
 \caption{The Pump Schematic}
 \label{fig_pumpschematic}
 \end{figure}
+
+\section{A Simple Test Apparatus}
+
+It is easy to source permanent magnets and difficult to source electomagnets with
+the precise shapes neede for this project.
+A test apparatus using only permanent magnets moved by hand to match the 4-stroke cylce
+of the pump should allow us to test the hypothesis that this pump will work and measure
+flow on a per-cycle basis.
+This approach will postpone the need to develop the electromanets.
+
+We therefore propose to make 3D printed apparatus that has cages for permanent magnets
+which can be moved into the pump ring and out of the pump ring to simulated turning
+an elctromagnet on and off.
+These cages are necessary because strong permanent magnets tend to want to fly into
+each other and must be carefully constrained.
+We believe we can furthermore make handles which we can glue to the magnets with
+hot-melt glue to make the motion of the magnets easier to effect.
+We suspect that the magnest will stay in place when in the ring,
+and have to held when out of the ring, which may require three hands or
+some dextrous holding.
 
 
 \section{Conclusions}
