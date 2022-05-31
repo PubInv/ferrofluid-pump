@@ -25,6 +25,8 @@ echo(EquilateralAltitude);
 HeptagonRadius = 10;
 InternalAngleDeg = 360 / 7;
 
+LockRingHeight = 10;
+
 PI = 3.14152;
 echo("CircumscribedRadius");
 echo(CircumscribedRadius);
@@ -202,7 +204,7 @@ module waterports(CircumscribedRadius) {
 }
 module waterportCavities(CircumscribedRadius) {
      r = CircumscribedRadius;
-    
+  
     order=7;
     rotate(0 * 360 / order) 
       translate([r*1.4,0,0]) 
@@ -256,16 +258,49 @@ module slab() {
     }
 }
 
+module basicRing(r) {
+    w = 2;
+    rotate([0,90,0])
+    difference() {
+        cylinder(LockRingHeight,r+w,r+w,center=true);
+        cylinder(LockRingHeight+10,r,r,center=true);
+    }
+}
+
+module lockRings() {
+    r = CircumscribedRadius;
+    radiusAtMidPoint = sqrt(CircumscribedRadius^2 -  a^2);
+    echo("Radius AtMidPoint");
+    echo(radiusAtMidPoint);
+    x = radiusAtMidPoint + EquilateralAltitude;     
+    order=7;
+    distanceToLock = 1.5;
+    translate([0,0,LockRingHeight/2 + SlabHeight/2])
+    union() {
+    rotate(1.5 * 360 / order) 
+        translate([x,0,0]) 
+            rotate([0,90,0])
+                 basicRing(a);
+    
+    rotate(5.5 * 360 / order) 
+        translate([x,0,0]) 
+            rotate([0,90,0])
+                basicRing(a);
+    }
+}
+
 module completePump() {
     difference() {
         union() {
            slab();
+           lockRings();
  //     interiorCircle = a / CircleRadiusIncrease;
  //     replicate_Cage_at_points3D(7,interiorCircle,CircumscribedRadius,SlabHeight,MagnetHeight,1);
         }
         interior();
     }
-//    interior();
+//    interior();   
+
     translate([0.85 * a,LuerPosition,0]) rotate([90,0,0]) luer();
     translate([0.85 * a,-LuerPosition,0]) rotate([270,0,0]) luer();
     waterports(CircumscribedRadius);
