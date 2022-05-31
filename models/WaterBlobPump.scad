@@ -268,8 +268,9 @@ module basicRing(r) {
 }
 
 module lockRings() {
-    r = CircumscribedRadius;
-    radiusAtMidPoint = sqrt(CircumscribedRadius^2 -  a^2);
+    // This should be the diameter of the permanent magnets used in the locks
+    lockRadius = 12.5;
+    radiusAtMidPoint = sqrt(CircumscribedRadius^2 -  lockRadius^2);
     echo("Radius AtMidPoint");
     echo(radiusAtMidPoint);
     x = radiusAtMidPoint + EquilateralAltitude;     
@@ -280,12 +281,12 @@ module lockRings() {
     rotate(1.5 * 360 / order) 
         translate([x,0,0]) 
             rotate([0,90,0])
-                 basicRing(a);
+                 basicRing(lockRadius);
     
     rotate(5.5 * 360 / order) 
         translate([x,0,0]) 
             rotate([0,90,0])
-                basicRing(a);
+                basicRing(lockRadius);
     }
 }
 
