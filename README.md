@@ -5,7 +5,7 @@ Ferrofluid pump with rotating water blobs and no moving parts
 
 This idea seems to work:
 
-<a href="[https://www.example.com](https://youtube.com/shorts/PQ8AnhncvDY?feature=share)" title="Boat Pump Example">
+<a href="https://youtube.com/shorts/PQ8AnhncvDY?feature=share" title="Boat Pump Example">
   <img width="296" height="523" alt="magnet switched on and off asking as pump" src="https://github.com/user-attachments/assets/f9c72341-a7ff-4743-8957-7ae648b7105f" />
 </a>
 
