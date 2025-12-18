@@ -5,7 +5,10 @@ Ferrofluid pump with rotating water blobs and no moving parts
 
 This idea seems to work:
 
-<img width="296" height="523" alt="Screenshot 2025-12-17 at 6 20 47 PM" src="https://github.com/user-attachments/assets/f9c72341-a7ff-4743-8957-7ae648b7105f" />
+<a href="[https://www.example.com](https://youtube.com/shorts/PQ8AnhncvDY?feature=share)" title="Boat Pump Example">
+  <img width="296" height="523" alt="magnet switched on and off asking as pump" src="https://github.com/user-attachments/assets/f9c72341-a7ff-4743-8957-7ae648b7105f" />
+</a>
+
 [https://youtube.com/shorts/PQ8AnhncvDY?feature=share](https://youtube.com/shorts/PQ8AnhncvDY?feature=share)
 
 
