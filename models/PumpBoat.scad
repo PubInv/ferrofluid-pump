@@ -44,6 +44,8 @@ ramp_displacement = magnet_radius/2;
 chute_height = magnet_radius*2;
 chute_length = ramp_length + magnet_radius;
 
+chimney_height = 20;
+
 $fn = 60;
 
 module boat() {
@@ -88,4 +90,48 @@ module pump() {
     ramp();
 }
 
+module chimney(gap, d, ww = 2){
+    color("orange")
+    translate([0, 0, chimney_height/2])
+    difference(){
+        cube([d + ww, gap, chimney_height], center = true);
+        cube([d, gap - ww, chimney_height + 1], center = true);
+        translate([(d + 2*ww)/2, 0, -chimney_height/2 + ramp_height])
+        #cube([ww*2, gap, d], center = true);
+     }
+}
+//magnet_center_height = magnet_radius;
+//chute_wall = 2;
+//ramp_height = magnet_radius;
+//ramp_length = boat_r+port_displacement;
+//chute_inner_w = gap_width;
+//ramp_displacement = magnet_radius/2;
+//chute_height = magnet_radius*2;
+//chute_length = ramp_length + magnet_radius;
+
+module magnet_holders(){
+    //when looking from +x, top right
+    color("pink")
+    translate([-(magnet_radius+chute_wall), gap_width/2, 0])
+    cube([chute_wall, chute_wall, chimney_height]);
+    
+    //top left
+    color("pink")
+    translate([-(magnet_radius+chute_wall), -(gap_width/2+chute_wall), 0])
+    cube([chute_wall, chute_wall, chimney_height]);
+    
+    //bottom left
+    color("pink")
+    translate([+(magnet_radius), -(gap_width/2+chute_wall), 0])
+    cube([chute_wall, chute_wall, chimney_height]);
+    
+    //bottom right
+    color("pink")
+    translate([+(magnet_radius), (gap_width/2), 0])
+    cube([chute_wall, chute_wall, chimney_height]);
+}
+
+
 pump();
+chimney(gap_width, magnet_diameter);
+magnet_holders();
