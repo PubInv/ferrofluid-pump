@@ -44,7 +44,7 @@ ramp_displacement = magnet_radius/2;
 chute_height = magnet_radius*2;
 chute_length = ramp_length + magnet_radius;
 
-chimney_height = 20;
+chimney_height = 30;
 
 $fn = 60;
 
@@ -97,7 +97,12 @@ module chimney(gap, d, ww = 2){
         cube([d + ww, gap, chimney_height], center = true);
         cube([d, gap - ww, chimney_height + 1], center = true);
         translate([(d + 2*ww)/2, 0, -chimney_height/2 + ramp_height])
-        #cube([ww*2, gap, d], center = true);
+        cube([ww*2, gap, d], center = true);
+     }
+     translate([0,0,chimney_height +  ww/2])
+     difference() {
+        cube([d + ww, gap, ww], center = true);
+        cylinder(chimney_height,r=ww/3,center=true);
      }
 }
 //magnet_center_height = magnet_radius;
