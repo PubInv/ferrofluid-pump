@@ -1,6 +1,22 @@
 # Ferrofluid Pump
 Ferrofluid pump with rotating water blobs and no moving parts
 
+# Our Best Prototype So Far
+
+We have a YouTube video of our best prototype so far:
+
+[https://www.youtube.com/shorts/qeiMMLq5IXo](https://www.youtube.com/shorts/qeiMMLq5IXo)
+
+# The Latest Version
+
+Our latest multi-magnet version (which has not yet been tested) is here:
+
+![IMG_1505](https://github.com/user-attachments/assets/cce7b0b2-d6c9-47ba-a0b3-8d73de1019ea)
+
+
+![IMG_1504](https://github.com/user-attachments/assets/8403558e-b6e3-43df-9817-91d970247900)
+
+
 # The Boat-Pump Idea
 
 This idea seems to work:
