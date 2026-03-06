@@ -48,6 +48,8 @@ chimney_height = 30;
 
 $fn = 60;
 
+USE_VERTICAL_KNIFE = 1;
+
 module boat() {
     translate([0,0,-boat_h/2])
     difference() {
@@ -92,13 +94,17 @@ module pump() {
 
 module chimney(gap, d, ww = 2){
     color("orange")
+    gap_adjustment = 2.5;
     translate([0, 0, chimney_height/2])
     difference(){
         cube([d + ww, gap, chimney_height], center = true);
         cube([d, gap - ww, chimney_height + 1], center = true);
-        translate([(d + 2*ww)/2, 0, -chimney_height/2 + ramp_height])
+        
+        // cutaway outlet opening.
+        translate([(d + 2*ww)/2, 0, -chimney_height/2 + ramp_height+ -gap_adjustment])
         cube([ww*2, gap, d], center = true);
      }
+     // lid 
      translate([0,0,chimney_height +  ww/2])
      difference() {
         cube([d + ww, gap, ww], center = true);
@@ -164,11 +170,23 @@ module closeramp(){
         cylinder(chute_wall*3, r=2);
         }
     }
-
-pump();
-closeramp();
-chimney(gap_width, magnet_diameter);
-magnet_holders();
-translate([-port_displacement,0,-34]) barb(2.5 , 6, 2); // Barb
-rotate([-90,0,-90])translate([0,-3,boat_r]) barb(2.5
-, 6, 2); // Barb
+module completePump() {
+    pump();
+    closeramp();
+    chimney(gap_width, magnet_diameter);
+    magnet_holders();
+    translate([-port_displacement,0,-34]) 
+    barb(2.5 , 6, 2); // Barb
+    rotate([-90,0,-90])
+    translate([0,-3,boat_r]) 
+    barb(2.5, 6, 2); // Barb
+}
+if (USE_VERTICAL_KNIFE) {
+    difference() {
+        completePump();
+        translate([110,0,0])
+        cube([200,200,200],center=true);
+    }
+} else {
+    completePump();
+}
