@@ -48,14 +48,14 @@ chimney_height = 30;
 
 $fn = 60;
 
-USE_VERTICAL_KNIFE = 1;
 
 module boat() {
     translate([0,0,-boat_h/2])
     difference() {
         cylinder(h = boat_h,r = boat_r,center=true);
-        translate([-port_displacement,0,0])
+        translate([-port_displacement,0,5.7])
         cylinder(h = boat_h+1,r = fluid_port_r,center=true);
+       
     }
 }
 
@@ -87,13 +87,16 @@ module ramp() {
 }
 
 module pump() {
-    boat();
+    difference(){
+        boat();
+        translate([-1,-0.5,-4])rotate([-30,90,0]) cylinder(h = 30,r = 2);
+    }
     chute();
     ramp();
 }
 
 module chimney(gap, d, ww = 2){
-    color("orange")
+    color("orange");
     gap_adjustment = 2.5;
     translate([0, 0, chimney_height/2])
     difference(){
@@ -158,6 +161,7 @@ module barb(radius, height, barb_depth) {
     ]);
     
 }
+
 module closeramp(){
     translate([chute_wall*2, -2*chute_wall, chute_wall*3])
     cube([ramp_length-6, chute_wall*4, chute_wall/1.5]);
@@ -175,18 +179,22 @@ module completePump() {
     closeramp();
     chimney(gap_width, magnet_diameter);
     magnet_holders();
-    translate([-port_displacement,0,-34]) 
+    /*dx: -7.61078  dy: -4.44922  dz: 0*/
+    translate([2*(boat_r)-7.7,2*14.5-4.5,-4]) rotate([150,90,0])
     barb(2.5 , 6, 2); // Barb
-    rotate([-90,0,-90])
-    translate([0,-3,boat_r]) 
+    rotate([90,0,-90])
+    translate([0,3,-2*boat_r+1]) 
     barb(2.5, 6, 2); // Barb
 }
-if (USE_VERTICAL_KNIFE) {
+/*if (USE_VERTICAL_KNIFE) {
     difference() {
         completePump();
-        translate([110,0,0])
+        translate([100,0,0])
         cube([200,200,200],center=true);
     }
 } else {
     completePump();
 }
+*/
+
+completePump();
