@@ -180,7 +180,7 @@ module completePump() {
     chimney(gap_width, magnet_diameter);
     magnet_holders();
     /*dx: -7.61078  dy: -4.44922  dz: 0*/
-    translate([2*(boat_r)-7.7,2*14.5-4.5,-4]) rotate([150,90,0])
+    translate([2*(boat_r)-8,2*14.5-4.65,-4]) rotate([150,90,0])
     barb(2.5 , 6, 2); // Barb
     rotate([90,0,-90])
     translate([0,3,-2*boat_r+1]) 
