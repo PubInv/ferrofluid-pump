@@ -192,7 +192,8 @@ module completePump() {
 if (USE_VERTICAL_KNIFE) {
     difference() {
         completePump();
-        translate([150,0,0])
+        translate([100
+        ,0,97])
         cube([200,200,200],center=true);
     }
 } else {
