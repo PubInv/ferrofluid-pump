@@ -48,6 +48,8 @@ chimney_height = 30;
 
 $fn = 60;
 
+USE_VERTICAL_KNIFE = 1;
+
 
 module boat() {
     translate([0,0,-boat_h/2])
@@ -190,15 +192,16 @@ module completePump() {
     translate([0,2,-2*boat_r+1]) 
     barb(2.5, 6, 2); // Barb
 }
-/*if (USE_VERTICAL_KNIFE) {
+
+if (USE_VERTICAL_KNIFE) {
     difference() {
         completePump();
-        translate([100,0,0])
+        translate([150,0,0])
         cube([200,200,200],center=true);
     }
 } else {
     completePump();
 }
-*/
 
-completePump();
+
+// completePump();
