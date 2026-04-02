@@ -102,20 +102,24 @@ module chimney(gap, d, ww = 2){
     gap_adjustment = 2.5;
     translate([0, 0, chimney_height/2])
     difference(){
-        cube([d + ww, gap, chimney_height], center = true);
+        cube([d + 2*ww, gap, chimney_height], center = true);
         cube([d, gap - ww, chimney_height + 1], center = true);
-        
+       }
+       
         // cutaway outlet opening.
         translate([(d + 2*ww)/2, 0, -chimney_height/2 + ramp_height+ -gap_adjustment])
         cube([ww*2, gap, d], center = true);
-     }
+     
      // lid 
      translate([0,0,chimney_height +  ww/2])
      difference() {
-        cube([d + ww, gap, ww], center = true);
-        cylinder(chimney_height,r=ww/3,center=true);
-     }
+        cube([d + 2*ww, gap, ww], center = true);
+        cylinder(chimney_height,r=ww/3,center=true); 
+   
+}       
 }
+
+
 //magnet_center_height = magnet_radius;
 //chute_wall = 2;
 //ramp_height = magnet_radius;
@@ -172,7 +176,7 @@ module closeramp(){
         translate([chute_length-7.25, -chute_inner_w/2, 0])
         cube([chute_wall, chute_inner_w, chute_height]);
         rotate([0, 90, 0])
-        translate([-3, 0, chute_length-(chute_wall*4)])
+        translate([-2, 0, chute_length-(chute_wall*4)])
         cylinder(chute_wall*3, r=2);
         }
     }
@@ -185,7 +189,7 @@ module completePump() {
     translate([2*(boat_r)-8,2*14.5-4.65,-4]) rotate([150,90,0])
     barb(2.5 , 6, 2); // Barb
     rotate([90,0,-90])
-    translate([0,3,-2*boat_r+1]) 
+    translate([0,2,-2*boat_r+1]) 
     barb(2.5, 6, 2); // Barb
 }
 
