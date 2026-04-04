@@ -48,7 +48,7 @@ chimney_height = 30;
 
 $fn = 60;
 
-USE_VERTICAL_KNIFE = 1;
+USE_VERTICAL_KNIFE = 0;
 
 
 module boat() {
@@ -87,11 +87,13 @@ module ramp() {
         polygon(points = [[port_displacement,0],[0,ramp_height],[ramp_length,0]]);
     }
 }
-
+inlet_translation_vector = [-2.8,-0.1,-4];
 module pump() {
     difference(){
         boat();
-        translate([-1,-0.5,-4])rotate([-30,90,0]) cylinder(h = 30,r = 2);
+        translate(inlet_translation_vector)
+        rotate([-30,90,0]) 
+        cylinder(h = 33,r = 2);
     }
     chute();
     ramp();
@@ -99,24 +101,24 @@ module pump() {
 
 module chimney(gap, d, ww = 2){
     color("orange");
-    gap_adjustment = 2.5;
+    gap_adjustment = 2;
     translate([0, 0, chimney_height/2])
-    difference(){
+    difference() {
         cube([d + 2*ww, gap, chimney_height], center = true);
+        // cut away inner part of chimney
         cube([d, (gap - ww)-1, chimney_height + 1], center = true);
-       }
-      
-        // cutaway outlet opening.
-        translate([(d + 2*ww)/2, 0, -chimney_height/2 + ramp_height+ -gap_adjustment])
-        cube([ww*2, gap, d], center = true);
+    
+    // cutaway outlet opening.
+        translate([(d + 2*ww)/2, 0, -chimney_height/2 + 1])
+        cube([ww*2+0.1, gap, d], center = true);
+   }
      
      // lid 
-     translate([0,0,chimney_height +  ww/2])
-     difference() {
+    translate([0,0,chimney_height +  ww/2])
+    difference() {
         cube([d + 2*ww, gap, ww], center = true);
         cylinder(chimney_height,r=ww/3,center=true); 
-       }
-
+    }
 }
 
 
@@ -186,8 +188,13 @@ module completePump() {
     chimney(gap_width, magnet_diameter);
     magnet_holders();
     /*dx: -7.61078  dy: -4.44922  dz: 0*/
+    /* Inlet */
+    /* TODO: This needs to be made a module, and 
+    all the magic numbers removed */
+    translate([-0.7,0.7,0])
     translate([2*(boat_r)-8,2*14.5-4.65,-4]) rotate([150,90,0])
     barb(2.5 , 6, 2); // Barb
+    /* Outlet */
     rotate([90,0,-90])
     translate([0,2,-2*boat_r+1]) 
     barb(2.5, 6, 2); // Barb
@@ -196,8 +203,7 @@ module completePump() {
 if (USE_VERTICAL_KNIFE) {
     difference() {
         completePump();
-        translate([100
-        ,0,97])
+        translate([-103,0,97])
         cube([200,200,200],center=true);
     }
 } else {
