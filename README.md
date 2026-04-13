@@ -49,4 +49,9 @@ We use a hot-melt glue to try to seal the "chamber" so that the fluid will flow 
 
 ![IMG_1334](https://github.com/user-attachments/assets/c4396563-c2a8-4a19-95ea-13cd5dd594d2)
 
+# Possible Reading
+
+[https://www.researchgate.net/publication/245883107_Design_fabrication_and_testing_of_fixed-valve_micro-pumps](https://www.researchgate.net/publication/245883107_Design_fabrication_and_testing_of_fixed-valve_micro-pumps)
+
+
 
