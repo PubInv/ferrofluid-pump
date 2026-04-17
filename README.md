@@ -3,6 +3,11 @@ Ferrofluid pump with rotating water blobs and no moving parts
 
 # Our Best Prototype So Far
 
+On April 9th, I received this part which has not yet been tested yet:
+
+![IMG_1753](https://github.com/user-attachments/assets/4c24d6c5-acf6-4cf8-a98e-55eebd440ed4)
+
+
 We have a YouTube video of our best prototype so far:
 
 [https://www.youtube.com/shorts/qeiMMLq5IXo](https://www.youtube.com/shorts/qeiMMLq5IXo)
@@ -43,5 +48,10 @@ pump with no moving parts.
 We use a hot-melt glue to try to seal the "chamber" so that the fluid will flow down the ramp:
 
 ![IMG_1334](https://github.com/user-attachments/assets/c4396563-c2a8-4a19-95ea-13cd5dd594d2)
+
+# Possible Reading
+
+[https://www.researchgate.net/publication/245883107_Design_fabrication_and_testing_of_fixed-valve_micro-pumps](https://www.researchgate.net/publication/245883107_Design_fabrication_and_testing_of_fixed-valve_micro-pumps)
+
 
 
