@@ -44,20 +44,40 @@ ramp_displacement = magnet_radius/2;
 chute_height = magnet_radius*2;
 chute_length = ramp_length + magnet_radius;
 
-chimney_height = 30;
+chimney_height = 45;
+
+barb_radius = 2.5;
+barb_height = 6;
+barb_depth = 2;
 
 $fn = 60;
 
 USE_VERTICAL_KNIFE = 0;
+USE_LID = 0;
 
+
+module barb(radius, height, barb_depth) {
+    rotate_extrude()
+    polygon(points=[
+        [radius, 0],
+        [radius + barb_depth, height],
+        [radius, height],
+        [radius + barb_depth, 2*height],
+        [radius, 2*height],
+        [radius + barb_depth, 3*height],
+        [radius, 3*height],
+        [radius + barb_depth, 4*height],
+        [radius-0.5, 4*height], // Inner wall
+        [radius-0.5, 0]
+    ]);  
+}
 
 module boat() {
     translate([0,0,-boat_h/2])
     difference() {
         cylinder(h = boat_h,r = boat_r,center=true);
         translate([-port_displacement,0,5.7])
-        cylinder(h = boat_h+1,r = fluid_port_r,center=true);
-       
+        cylinder(h = boat_h+1,r = fluid_port_r,center=true);    
     }
 }
 
@@ -65,7 +85,7 @@ module chute() {
     h = chute_height;
     l = chute_length;
     w = chute_inner_w+chute_wall*2;
-    color("pink")
+    color("red")
     translate([l/2+-magnet_radius+-port_displacement,0,h/2])
     difference() {
         cube([l,w,h],center=true);
@@ -87,6 +107,7 @@ module ramp() {
         polygon(points = [[port_displacement,0],[0,ramp_height],[ramp_length,0]]);
     }
 }
+
 inlet_translation_vector = [-2.8,-0.1,-4];
 module pump() {
     difference(){
@@ -114,61 +135,38 @@ module chimney(gap, d, ww = 2){
    }
      
      // lid 
-    translate([0,0,chimney_height +  ww/2])
-    difference() {
-        cube([d + 2*ww, gap, ww], center = true);
-        cylinder(chimney_height,r=ww/3,center=true); 
+    if (USE_LID) {
+        translate([0,0,chimney_height +  ww/2])
+        difference() {
+            cube([d + 2*ww, gap, ww], center = true);
+            cylinder(chimney_height,r=ww/3,center=true); 
+        }
     }
 }
 
-
-//magnet_center_height = magnet_radius;
-//chute_wall = 2;
-//ramp_height = magnet_radius;
-//ramp_length = boat_r+port_displacement;
-//chute_inner_w = gap_width;
-//ramp_displacement = magnet_radius/2;
-//chute_height = magnet_radius*2;
-//chute_length = ramp_length + magnet_radius;
-
 module magnet_holders(){
     //when looking from +x, top right
-    color("pink")
+    color("green")
     translate([-(magnet_radius+chute_wall), gap_width/2, 0])
     cube([chute_wall, chute_wall, chimney_height]);
     
     //top left
-    color("pink")
+    color("green")
     translate([-(magnet_radius+chute_wall), -(gap_width/2+chute_wall), 0])
     cube([chute_wall, chute_wall, chimney_height]);
     
     //bottom left
-    color("pink")
+    color("green")
     translate([+(magnet_radius), -(gap_width/2+chute_wall), 0])
     cube([chute_wall, chute_wall, chimney_height]);
     
     //bottom right
-    color("pink")
+    color("green")
     translate([+(magnet_radius), (gap_width/2), 0])
     cube([chute_wall, chute_wall, chimney_height]);
 }
 
-module barb(radius, height, barb_depth) {
-    rotate_extrude()
-    polygon(points=[
-        [radius, 0],
-        [radius + barb_depth, height],
-        [radius, height],
-        [radius + barb_depth, 2*height],
-        [radius, 2*height],
-        [radius + barb_depth, 3*height],
-        [radius, 3*height],
-        [radius + barb_depth, 4*height],
-        [radius-0.5, 4*height], // Inner wall
-        [radius-0.5, 0]
-    ]);
-    
-}
+
 
 module closeramp(){
     translate([chute_wall*2, -2*chute_wall, chute_wall*3])
@@ -182,10 +180,40 @@ module closeramp(){
         cylinder(chute_wall*3, r=2);
         }
     }
+    
+// 
+module outlet_ramp(gap, d, ww = 2) {
+    color("orange");
+    gap_adjustment = 2;
+    x = (boat_r + magnet_radius+chute_wall);
+    translate([x/2-(magnet_radius+chute_wall), 0, chimney_height/2 + barb_depth*2])
+    difference() {
+        cube([x, gap, chimney_height], center = true);
+        // cut away inner part of chimney
+        cube([x-ww*2, (gap - ww)-1, chimney_height + 1], center = true);
+    
+    // cutaway outlet opening.
+ //       translate([(d + 2*ww)/2, 0, -chimney_height/2 + 1])
+  //      cube([ww*2+0.1, gap, d], center = true);
+   }
+     
+     // lid 
+    if (USE_LID) {
+        translate([0,0,chimney_height +  ww/2])
+        difference() {
+            cube([d + 2*ww, gap, ww], center = true);
+            cylinder(chimney_height,r=ww/3,center=true); 
+        }
+    }
+}
+
+
+
 module completePump() {
     pump();
-    closeramp();
-    chimney(gap_width, magnet_diameter);
+
+    outlet_ramp(gap_width,magnet_diameter);
+ //   chimney(gap_width, magnet_diameter);
     magnet_holders();
     /*dx: -7.61078  dy: -4.44922  dz: 0*/
     /* Inlet */
@@ -193,11 +221,11 @@ module completePump() {
     all the magic numbers removed */
     translate([-0.7,0.7,0])
     translate([2*(boat_r)-8,2*14.5-4.65,-4]) rotate([150,90,0])
-    barb(2.5 , 6, 2); // Barb
+    barb(barb_radius , barb_height, barb_depth); // Barb
     /* Outlet */
     rotate([90,0,-90])
     translate([0,2,-2*boat_r+1]) 
-    barb(2.5, 6, 2); // Barb
+    barb(barb_radius , barb_height, barb_depth);
 }
 
 if (USE_VERTICAL_KNIFE) {
