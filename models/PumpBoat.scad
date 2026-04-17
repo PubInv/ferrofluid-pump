@@ -36,9 +36,13 @@ magnet_radius = magnet_diameter/2; // radius of magnet cylinders
 gap_width = 6.25; // gap in the magnet
 
 magnet_center_height = magnet_radius;
+number_of_magnets = 3;
 chute_wall = 2;
+ww = 2; // this is the general wall width
 ramp_height = magnet_radius;
-ramp_length = boat_r+port_displacement;
+// This has to fit inside or magnet..
+ramp_length_max = 18;
+ramp_length = min(boat_r+port_displacement,ramp_length_max);
 chute_inner_w = gap_width;
 ramp_displacement = magnet_radius/2;
 chute_height = magnet_radius*2;
@@ -76,7 +80,7 @@ module boat() {
     translate([0,0,-boat_h/2])
     difference() {
         cylinder(h = boat_h,r = boat_r,center=true);
-        translate([-port_displacement,0,5.7])
+        translate([-port_displacement+0.5,0,5.7])
         cylinder(h = boat_h+1,r = fluid_port_r,center=true);    
     }
 }
@@ -99,12 +103,60 @@ module chute() {
     }
 }
 
-module ramp() {
+module old_ramp() {
     color("blue")
     translate([-ramp_displacement,0,0]) {
     rotate([90,0,0])
         linear_extrude(height=chute_inner_w,center=true)
         polygon(points = [[port_displacement,0],[0,ramp_height],[ramp_length,0]]);
+    }
+}
+/* 
+In this new model, the outlet ramp consists of three sections: a 1) "wall" that is strongly in the magnet field separating 
+the inlet from outlet,
+    2) ramp section designed to keep the fluid away from the 
+permanent locking magnet and 
+    3) a weaker slope to drive the fluid away from the magnets when they are turned off, so they won't suck the fluid back from the outlet.
+    This has dimensions:
+    magnet_fraction = A fraction of the magnet radius, an adjustable parameter
+    ramp_height = a height, likely the expected height of the highest magnet
+    lock_avoidance_height = height high enough to get the fluid away form the permanent lock
+    lock_avoidance_width = the horizontal displacement used to 
+    avoid the magnet, and give thickness to the higher parts
+    transport_ramp_height = height of gentle_ramp
+    
+    
+    This can be defined with 5 points as polygon:
+    Ax = the origin - magnet_fraction
+    Ay = 0
+    Bx = Ax
+    By = ramp_height
+    Cx = lock_avoidance_width
+    Cy = lock_avoidance_height
+    Dx = Transport_ramp_width
+    Dy = transport_ramp_height
+    Ex = ramp_width outlet
+    
+    
+*/
+module ramp() {
+    magnet_fraction = magnet_radius*0.75;
+    ramp_height = number_of_magnets*(magnet_radius*2) -magnet_radius;
+    A = [0,-magnet_fraction];
+    B = [A[0],ramp_height];
+    lock_avoidance_height = magnet_radius*2+1;
+    lock_avoidance_width = magnet_radius+1; 
+    C = [lock_avoidance_width,lock_avoidance_height];
+    transport_ramp_width = C[0]+magnet_radius;
+    transport_ramp_height = C[1]/2;
+    D = [transport_ramp_width,transport_ramp_height];
+    E = [ramp_length,0];
+  
+    color("blue")
+    translate([-ramp_displacement,0,0]) {
+    rotate([90,0,0])
+        linear_extrude(height=chute_inner_w,center=true)
+        polygon(points = [A,B,C,D,E]);
     }
 }
 
@@ -168,29 +220,32 @@ module magnet_holders(){
 
 
 
-module closeramp(){
-    translate([chute_wall*2, -2*chute_wall, chute_wall*3])
-    cube([ramp_length-6, chute_wall*4, chute_wall/1.5]);
-    
-    difference(){
-        translate([chute_length-7.25, -chute_inner_w/2, 0])
-        cube([chute_wall, chute_inner_w, chute_height]);
-        rotate([0, 90, 0])
-        translate([-2, 0, chute_length-(chute_wall*4)])
-        cylinder(chute_wall*3, r=2);
-        }
-    }
+//module closeramp(){
+//    translate([chute_wall*2, -2*chute_wall, chute_wall*3])
+//    cube([ramp_length-6, chute_wall*4, chute_wall/1.5]);
+//    
+//    difference(){
+//        translate([chute_length-7.25, -chute_inner_w/2, 0])
+//        cube([chute_wall, chute_inner_w, chute_height]);
+//        rotate([0, 90, 0])
+//        translate([-2, 0, chute_length-(chute_wall*4)])
+//        cylinder(chute_wall*3, r=2);
+//        }
+//    }
     
 // 
 module outlet_ramp(gap, d, ww = 2) {
     color("orange");
     gap_adjustment = 2;
-    x = (boat_r + magnet_radius+chute_wall);
-    translate([x/2-(magnet_radius+chute_wall), 0, chimney_height/2 + barb_depth*2])
+    x = (ramp_length+ww*2);
+    translate([x/2-(magnet_radius+chute_wall), 0, chimney_height/2 ])
     difference() {
         cube([x, gap, chimney_height], center = true);
         // cut away inner part of chimney
         cube([x-ww*2, (gap - ww)-1, chimney_height + 1], center = true);
+        // now cut away a port for so the flow can reach the outlet.
+        translate([x/2,0,-chimney_height/2+barb_depth])
+        cube([ww*2,(gap-ww)-1,barb_depth*2],center = true);
     
     // cutaway outlet opening.
  //       translate([(d + 2*ww)/2, 0, -chimney_height/2 + 1])
@@ -224,14 +279,14 @@ module completePump() {
     barb(barb_radius , barb_height, barb_depth); // Barb
     /* Outlet */
     rotate([90,0,-90])
-    translate([0,2,-2*boat_r+1]) 
+    translate([0,2,ww*2-(barb_height*4+ramp_length)]) 
     barb(barb_radius , barb_height, barb_depth);
 }
 
 if (USE_VERTICAL_KNIFE) {
     difference() {
         completePump();
-        translate([-103,0,97])
+        translate([-80,-100,97])
         cube([200,200,200],center=true);
     }
 } else {
