@@ -23,14 +23,13 @@ material_density_g_cm3 = 1.05; // typical resin print density
 neutral_buoyancy_volume_cm3 = magnet_weight_g/(fluid_density_g_cm3 - material_density_g_cm3);
 echo(neutral_buoyancy_volume_cm3);
 adjusted_buoyancy_volume_cm3 = neutral_buoyancy_volume_cm3*1.25;
-boat_r = 25; // original boat radius, still used by older placement math.
-boat_x = 2*boat_r;
-boat_y = 2*boat_r;
-boat_x_cm = boat_x/10;
+boat_w = 60;
+
+boat_y = 50;
+boat_w_cm = boat_w/10;
 boat_y_cm = boat_y/10;
-boat_area_cm2 = boat_x_cm*boat_y_cm;
-boat_h = adjusted_buoyancy_volume_cm3 / boat_area_cm2;
-echo(boat_h);
+boat_area_cm2 = boat_w_cm*boat_y_cm;
+boat_h = 10;
 
 fluid_port_r = 2; // hole for fluid
 port_displacement = 2; // position of hole
@@ -45,13 +44,16 @@ ww = 2; // this is the general wall width
 ramp_height = magnet_radius;
 // This has to fit inside or magnet..
 ramp_length_max = 18;
-ramp_length = min(boat_r+port_displacement,ramp_length_max);
+ramp_length = min(boat_y/2+port_displacement,ramp_length_max);
 chute_inner_w = gap_width;
 ramp_displacement = magnet_radius/2;
 chute_height = magnet_radius*2;
 chute_length = ramp_length + magnet_radius;
 
 chimney_height = 45;
+chimney_length = (ramp_length+ww*2);
+
+boat_disp_x = boat_w/2 - chimney_length ;
 
 barb_radius = 2.5;
 barb_height = 6;
@@ -62,7 +64,7 @@ barb_outer_radius = barb_radius + barb_depth;
 
 $fn = 60;
 
-USE_VERTICAL_KNIFE = 0;
+USE_VERTICAL_KNIFE = 1;
 USE_LID = 0;
 SHOW_PUMP = 1;
 SHOW_TRAY = 0;
@@ -77,14 +79,14 @@ tray_floor = 2;
 tray_freeboard = 4;
 tray_clearance = 6;
 tray_bottom_clearance = 3;
-tray_inner_r = 2*boat_r + tray_clearance;
+tray_inner_r = boat_y + tray_clearance;
 tray_outer_r = tray_inner_r + tray_wall;
 tray_fluid_depth = boat_h + tray_bottom_clearance;
 tray_total_h = tray_fluid_depth + tray_floor + tray_freeboard;
 outlet_tray_angle = 60;
 outlet_tray_direction = -12;
 tray_joint_gap = 0.4;
-tray_split_r = boat_r + tray_clearance/2;
+tray_split_r = boat_y + tray_clearance/2;
 inlet_tray_cut_r = tray_split_r - tray_joint_gap/2;
 outlet_tray_inner_r = tray_split_r + tray_joint_gap/2;
 tray_side_wall_angle = tray_wall*180/(PI*tray_split_r);
@@ -94,7 +96,7 @@ outlet_edge_relief_direction = 0;
 outlet_edge_lip_z = 0;
 boat_lip_wall = ww;
 boat_lip_height = 2*barb_depth + 1;
-boat_lip_outlet_overlap = 0.5;
+boat_lip_outlet_overlap = 0.6;
 boat_lip_outlet_flow_w = (gap_width - ww)-1;
 boat_lip_outlet_cut_w = max(
     boat_lip_outlet_flow_w,
@@ -129,12 +131,12 @@ module barb(radius, height, barb_depth) {
 module boat_lip() {
     difference() {
         translate([0, 0, boat_lip_height/2])
-        cube([boat_x, boat_y, boat_lip_height], center = true);
+        cube([boat_w, boat_y, boat_lip_height], center = true);
 
         translate([0, 0, boat_lip_height/2])
         cube(
             [
-                boat_x - 2*boat_lip_wall,
+                boat_w - 2*boat_lip_wall,
                 boat_y - 2*boat_lip_wall,
                 boat_lip_height + 1
             ],
@@ -144,7 +146,7 @@ module boat_lip() {
 }
 
 module boat_lip_outlet_cut() {
-    translate([boat_x/2 - boat_lip_wall/2, 0, boat_lip_height/2])
+    translate([boat_w/2 - boat_lip_wall/2, 0, boat_lip_height/2])
     cube(
         [
             boat_lip_wall*4,
@@ -156,18 +158,27 @@ module boat_lip_outlet_cut() {
 }
 
 module boat() {
+    reservoir_h = 6;
     difference() {
-        union() {
-            translate([0,0,-boat_h/2])
-            cube([boat_x, boat_y, boat_h], center = true);
+        translate([-boat_disp_x,0,0])
+        difference() {
+            union() {
+                translate([0,0,-boat_h/2])
+                cube([boat_w, boat_y, boat_h], center = true);
 
-            boat_lip();
+                boat_lip();
+            }
+
+
+            translate([-port_displacement+0.5,0,5.7])
+            cylinder(h = boat_h+1,r = fluid_port_r,center=true);
+
+            boat_lip_outlet_cut();
         }
-
-        translate([-port_displacement+0.5,0,5.7])
-        cylinder(h = boat_h+1,r = fluid_port_r,center=true);
-
-        boat_lip_outlet_cut();
+            // now remove a cylindrical fluid reservoir
+        
+        translate([0,0,-reservoir_h/2])
+        cylinder(h = reservoir_h, r = 3.3, center=true);
     }
 }
 
@@ -332,14 +343,14 @@ module magnet_holders(){
 module outlet_ramp(gap, d, ww = 2) {
     color("orange");
     gap_adjustment = 2;
-    x = (ramp_length+ww*2);
-    translate([x/2-(magnet_radius+chute_wall), 0, chimney_height/2 ])
+
+    translate([chimney_length/2-(magnet_radius+chute_wall), 0, chimney_height/2 ])
     difference() {
-        cube([x, gap, chimney_height], center = true);
+        cube([chimney_length, gap, chimney_height], center = true);
         // cut away inner part of chimney
-        cube([x-ww*2, (gap - ww)-1, chimney_height + 1], center = true);
+        cube([chimney_length-ww*2, (gap - ww)-1, chimney_height + 1], center = true);
         // now cut away a port for so the flow can reach the outlet.
-        translate([x/2,0,-chimney_height/2+barb_depth])
+        translate([chimney_length/2,0,-chimney_height/2+barb_depth])
         cube([ww*2,(gap-ww)-1,barb_depth*2],center = true);
     
     // cutaway outlet opening.
