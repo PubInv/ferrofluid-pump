@@ -14,8 +14,6 @@
 // Nonetheless, I believe it is intriguing as a pump that 
 // has no moving parts.
 
-include <tray.scad>
-
 
 // Here are some major parameters:
 // (all sizes in mm)
@@ -25,13 +23,11 @@ material_density_g_cm3 = 1.05; // typical resin print density
 neutral_buoyancy_volume_cm3 = magnet_weight_g/(fluid_density_g_cm3 - material_density_g_cm3);
 echo(neutral_buoyancy_volume_cm3);
 adjusted_buoyancy_volume_cm3 = neutral_buoyancy_volume_cm3*1.25;
-boat_w = 60;
-
-boat_y = 50;
-boat_w_cm = boat_w/10;
-boat_y_cm = boat_y/10;
-boat_area_cm2 = boat_w_cm*boat_y_cm;
-boat_h = 12;
+boat_r = 25; // boat radius.
+boat_r_cm = boat_r/10;
+boat_area_cm2 = PI*boat_r_cm*boat_r_cm;
+boat_h = adjusted_buoyancy_volume_cm3 / boat_area_cm2;
+echo(boat_h);
 
 fluid_port_r = 2; // hole for fluid
 port_displacement = 2; // position of hole
@@ -46,48 +42,22 @@ ww = 2; // this is the general wall width
 ramp_height = magnet_radius;
 // This has to fit inside or magnet..
 ramp_length_max = 18;
-ramp_length = min(boat_y/2+port_displacement,ramp_length_max);
+ramp_length = min(boat_r+port_displacement,ramp_length_max);
 chute_inner_w = gap_width;
 ramp_displacement = magnet_radius/2;
 chute_height = magnet_radius*2;
 chute_length = ramp_length + magnet_radius;
 
 chimney_height = 45;
-chimney_length = (ramp_length+ww*2);
-
-boat_disp_x = boat_w/2 - chimney_length ;
 
 barb_radius = 2.5;
 barb_height = 6;
-number_of_barbs = 4;
-total_barb_length = barb_height * number_of_barbs;
 barb_depth = 2;
-barb_outer_radius = barb_radius + barb_depth;
 
 $fn = 60;
 
-USE_VERTICAL_KNIFE = 1;
+USE_VERTICAL_KNIFE = 0;
 USE_LID = 0;
-SHOW_PUMP = 1;
-SHOW_INLET = 1;
-SHOW_OUTLET = 1;
-
-boat_lip_wall = ww;
-boat_lip_height = 2*barb_depth + 1;
-boat_lip_outlet_overlap = 0.6;
-boat_lip_outlet_flow_w = (gap_width - ww)-1;
-boat_lip_outlet_cut_w = max(
-    boat_lip_outlet_flow_w,
-    gap_width - 2*boat_lip_outlet_overlap
-);
-inlet_port_x = 0;
-inlet_barb_floor_clearance = 3;
-inlet_port_z = -boat_h + inlet_barb_floor_clearance + barb_outer_radius;
-inlet_channel_inner_y = 0;
-inlet_channel_outer_y = boat_y/2 + barb_depth;
-inlet_channel_length = inlet_channel_outer_y - inlet_channel_inner_y;
-inlet_channel_center_y = (inlet_channel_inner_y + inlet_channel_outer_y)/2;
-inlet_barb_base_y = boat_y/2;
 
 
 module barb(radius, height, barb_depth) {
@@ -106,57 +76,12 @@ module barb(radius, height, barb_depth) {
     ]);  
 }
 
-module boat_lip() {
-    difference() {
-        translate([0, 0, boat_lip_height/2])
-        cube([boat_w, boat_y, boat_lip_height], center = true);
-
-        translate([0, 0, boat_lip_height/2])
-        cube(
-            [
-                boat_w - 2*boat_lip_wall,
-                boat_y - 2*boat_lip_wall,
-                boat_lip_height + 1
-            ],
-            center = true
-        );
-    }
-}
-
-module boat_lip_outlet_cut() {
-    translate([boat_w/2 - boat_lip_wall/2, 0, boat_lip_height/2])
-    cube(
-        [
-            boat_lip_wall*4,
-            boat_lip_outlet_cut_w,
-            boat_lip_height + 0.1
-        ],
-        center = true
-    );
-}
-
 module boat() {
-    reservoir_h = 6;
+    translate([0,0,-boat_h/2])
     difference() {
-        translate([-boat_disp_x,0,0])
-        difference() {
-            union() {
-                translate([0,0,-boat_h/2])
-                cube([boat_w, boat_y, boat_h], center = true);
-
-                boat_lip();
-            }
-
-
-            translate([-port_displacement+0.5,0,5.7])
-            cylinder(h = boat_h+1,r = fluid_port_r,center=true);
-
-            boat_lip_outlet_cut();
-        }
-            // now remove a cylindrical fluid reservoir
-        
-        translate([0,0,-reservoir_h/2])
-        cylinder(h = reservoir_h, r = 3.3, center=true);
+        cylinder(h = boat_h,r = boat_r,center=true);
+        translate([-port_displacement+0.5,0,5.7])
+        cylinder(h = boat_h+1,r = fluid_port_r,center=true);    
     }
 }
 
@@ -235,22 +160,13 @@ module ramp() {
     }
 }
 
-module inlet_channel_cut() {
-    translate([inlet_port_x, inlet_channel_center_y, inlet_port_z])
-    rotate([90,0,0])
-    cylinder(h = inlet_channel_length, r = fluid_port_r, center = true);
-}
-
-module inlet_barb() {
-    translate([inlet_port_x, inlet_barb_base_y + total_barb_length, inlet_port_z])
-    rotate([90,0,0])
-    barb(barb_radius , barb_height, barb_depth);
-}
-
+inlet_translation_vector = [-2.8,-0.1,-4];
 module pump() {
     difference(){
         boat();
-        inlet_channel_cut();
+        translate(inlet_translation_vector)
+        rotate([-30,90,0]) 
+        cylinder(h = 33,r = 2);
     }
     chute();
     ramp();
@@ -321,14 +237,14 @@ module magnet_holders(){
 module outlet_ramp(gap, d, ww = 2) {
     color("orange");
     gap_adjustment = 2;
-
-    translate([chimney_length/2-(magnet_radius+chute_wall), 0, chimney_height/2 ])
+    x = (ramp_length+ww*2);
+    translate([x/2-(magnet_radius+chute_wall), 0, chimney_height/2 ])
     difference() {
-        cube([chimney_length, gap, chimney_height], center = true);
+        cube([x, gap, chimney_height], center = true);
         // cut away inner part of chimney
-        cube([chimney_length-ww*2, (gap - ww)-1, chimney_height + 1], center = true);
+        cube([x-ww*2, (gap - ww)-1, chimney_height + 1], center = true);
         // now cut away a port for so the flow can reach the outlet.
-        translate([chimney_length/2,0,-chimney_height/2+barb_depth])
+        translate([x/2,0,-chimney_height/2+barb_depth])
         cube([ww*2,(gap-ww)-1,barb_depth*2],center = true);
     
     // cutaway outlet opening.
@@ -358,53 +274,23 @@ module completePump() {
     /* Inlet */
     /* TODO: This needs to be made a module, and 
     all the magic numbers removed */
-    inlet_barb();
+    translate([-0.7,0.7,0])
+    translate([2*(boat_r)-8,2*14.5-4.65,-4]) rotate([150,90,0])
+    barb(barb_radius , barb_height, barb_depth); // Barb
     /* Outlet */
     rotate([90,0,-90])
-    translate([0,2,ww*2-(total_barb_length+ramp_length)]) 
+    translate([0,2,ww*2-(barb_height*4+ramp_length)]) 
     barb(barb_radius , barb_height, barb_depth);
 }
-module inlet_tray() {
-    // This should center us
-    x = 40;
-    y = 40;
-    z = 9;
-    translate([-x/2,-y/2,-z/2])
-    tray([x,y,z], thickness=2, bottom_thickness=2);
-}
 
-module outlet_tray() {
-    x = 40;
-    y = 60;
-    z = 20;
-    translate([-x/2,-y/2,-z/2])
+if (USE_VERTICAL_KNIFE) {
     difference() {
-        tray([x,y,z], thickness=2, bottom_thickness=2);
-        //now cut a part away so that the hole in the barb is not obstruced.
-        translate([(x+-barb_outer_radius*2)/2,-3,3])
-        cube([barb_outer_radius*2,10,barb_outer_radius*2]);
+        completePump();
+        translate([-80,-100,97])
+        cube([200,200,200],center=true);
     }
-}
-
-if (SHOW_INLET) {
-    translate([43,0,-8])
-    inlet_tray();
-}
-if (SHOW_OUTLET) {
-    translate([0,(boat_y+60)/2 + -0.5,-2])
-    outlet_tray();
-}
-
-if (SHOW_PUMP) {
-    if (USE_VERTICAL_KNIFE) {
-        difference() {
-            completePump();
-            translate([-80,-100,97])
-            cube([200,200,200],center=true);
-        }
-    } else {
-        completePumpWithTray();
-    }
+} else {
+    completePump();
 }
 
 
