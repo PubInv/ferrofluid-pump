@@ -17,7 +17,7 @@
 include <tray.scad>
 
 
-PB_VERSION = "0.0.1";
+PB_VERSION = "0.0.2";
 
 
 // Here are some major parameters:
@@ -359,7 +359,7 @@ module outlet_ramp(gap, d, ww = 2) {
 }
 
 module chamber(gap, d, ww = 2){
-    chamber_side = 0;
+    chamber_side = chimney_length/2-(magnet_radius+chute_wall);
 
     difference(){
         translate([chamber_side,0,chimney_height])
