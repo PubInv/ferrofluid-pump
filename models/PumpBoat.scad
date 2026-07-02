@@ -92,6 +92,9 @@ inlet_channel_length = inlet_channel_outer_y - inlet_channel_inner_y;
 inlet_channel_center_y = (inlet_channel_inner_y + inlet_channel_outer_y)/2;
 inlet_barb_base_y = boat_y/2;
 
+chamber_height = 15;
+chamber_radius = 15;
+chamber_wall = 3;
 
 module barb(radius, height, barb_depth) {
     rotate_extrude()
@@ -355,10 +358,24 @@ module outlet_ramp(gap, d, ww = 2) {
     }
 }
 
+module chamber(gap, d, ww = 2){
+    chamber_up = 50;
 
+    difference(){
+        translate([chamber_up,0,chimney_height-chamber_wall])
+            cylinder(chamber_height,r=chamber_radius);
+            
+        translate([chamber_up,0,chimney_height])    
+            cylinder(chamber_height-2*chamber_wall,r=chamber_radius-chamber_wall);
+        
+    translate([chimney_height, 0, chimney_height])
+        #cube([chimney_length-ww*2, (gap - ww)-1, chimney_height + 1], center = true);
+  }
+}
 
 module completePump() {
     pump();
+    chamber(gap_width,magnet_diameter);
 
     outlet_ramp(gap_width,magnet_diameter);
  //   chimney(gap_width, magnet_diameter);
@@ -408,8 +425,8 @@ if (SHOW_PUMP) {
     if (USE_VERTICAL_KNIFE) {
         difference() {
             completePump();
-            translate([-80,-100,97])
-            cube([200,200,200],center=true);
+            translate([chimney_length,0,chimney_height+30])
+            cube([50,50,50],center=true);
         }
     } else {
         completePumpWithTray();
