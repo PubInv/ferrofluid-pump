@@ -265,29 +265,29 @@ module pump() {
     ramp();
 }
 
-module chimney(gap, d, ww = 2){
-    color("orange");
-    gap_adjustment = 2;
-    translate([0, 0, chimney_height/2])
-    difference() {
-        cube([d + 2*ww, gap, chimney_height], center = true);
-        // cut away inner part of chimney
-        cube([d, (gap - ww)-1, chimney_height + 1], center = true);
-    
-    // cutaway outlet opening.
-        translate([(d + 2*ww)/2, 0, -chimney_height/2 + 1])
-        cube([ww*2+0.1, gap, d], center = true);
-   }
-     
-     // lid 
-    if (USE_LID) {
-        translate([0,0,chimney_height +  ww/2])
-        difference() {
-            cube([d + 2*ww, gap, ww], center = true);
-            cylinder(chimney_height,r=ww/3,center=true); 
-        }
-    }
-}
+//module chimney(gap, d, ww = 2){
+//    color("orange");
+//    gap_adjustment = 2;
+//    translate([0, 0, chimney_height/2])
+//    difference() {
+//        cube([d + 2*ww, gap, chimney_height], center = true);
+//        // cut away inner part of chimney
+//        cube([d, (gap - ww)-1, chimney_height + 1], center = true);
+//    
+//    // cutaway outlet opening.
+//        translate([(d + 2*ww)/2, 0, -chimney_height/2 + 1])
+//        cube([ww*2+0.1, gap, d], center = true);
+//   }
+//     
+//     // lid 
+//    if (USE_LID) {
+//        translate([0,0,chimney_height +  ww/2])
+//        difference() {
+//            cube([d + 2*ww, gap, ww], center = true);
+//            cylinder(chimney_height,r=ww/3,center=true); 
+//        }
+//    }
+//}
 
 module magnet_holders(){
     //when looking from +x, top right
