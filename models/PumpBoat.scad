@@ -359,17 +359,17 @@ module outlet_ramp(gap, d, ww = 2) {
 }
 
 module chamber(gap, d, ww = 2){
-    chamber_up = 50;
+    chamber_side = 0;
 
     difference(){
-        translate([chamber_up,0,chimney_height-chamber_wall])
+        translate([chamber_side,0,chimney_height])
             cylinder(chamber_height,r=chamber_radius);
             
-        translate([chamber_up,0,chimney_height])    
+        translate([chamber_side,0,chimney_height+chamber_wall])    
             cylinder(chamber_height-2*chamber_wall,r=chamber_radius-chamber_wall);
         
-    translate([chimney_height, 0, chimney_height])
-        #cube([chimney_length-ww*2, (gap - ww)-1, chimney_height + 1], center = true);
+    translate([chamber_side, 0, chimney_height])
+        #cube([chimney_length-ww*2, (gap - ww)-1, 2*chamber_wall], center = true);
   }
 }
 
