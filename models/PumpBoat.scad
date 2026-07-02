@@ -164,6 +164,8 @@ module chute() {
     h = chute_height;
     l = chute_length;
     w = chute_inner_w+chute_wall*2;
+    echo("chute_inner_w");
+    echo(chute_inner_w);
     color("red")
     translate([l/2+-magnet_radius+-port_displacement,0,h/2])
     difference() {
@@ -216,7 +218,11 @@ permanent locking magnet and
 */
 module ramp() {
     magnet_fraction = magnet_radius*0.75;
+    echo("magnet_fraction");
+    echo(magnet_fraction);
     ramp_height = number_of_magnets*(magnet_radius*2) -magnet_radius;
+    echo("ramp_height");
+    echo(ramp_height);
     A = [0,-magnet_fraction];
     B = [A[0],ramp_height];
     lock_avoidance_height = magnet_radius*2+1;
@@ -364,7 +370,7 @@ module completePump() {
     translate([0,2,ww*2-(total_barb_length+ramp_length)]) 
     barb(barb_radius , barb_height, barb_depth);
 }
-module inlet_tray() {
+module outlet_tray() {
     // This should center us
     x = 40;
     y = 40;
@@ -373,11 +379,11 @@ module inlet_tray() {
     tray([x,y,z], thickness=2, bottom_thickness=2);
 }
 
-module outlet_tray() {
+module inlet_tray() {
     x = 40;
     y = 60;
-    z = 20;
-    translate([-x/2,-y/2,-z/2])
+    z = 25;
+    translate([-x/2,-y/2,-barb_outer_radius*2-1])
     difference() {
         tray([x,y,z], thickness=2, bottom_thickness=2);
         //now cut a part away so that the hole in the barb is not obstruced.
@@ -386,13 +392,13 @@ module outlet_tray() {
     }
 }
 
-if (SHOW_INLET) {
-    translate([43,0,-8])
-    inlet_tray();
-}
 if (SHOW_OUTLET) {
-    translate([0,(boat_y+60)/2 + -0.5,-2])
+    translate([43,0,-8])
     outlet_tray();
+}
+if (SHOW_INLET) {
+    translate([0,(boat_y+60)/2 + -0.5,-2])
+    inlet_tray();
 }
 
 if (SHOW_PUMP) {
