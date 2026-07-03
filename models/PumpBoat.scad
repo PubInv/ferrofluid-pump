@@ -17,7 +17,7 @@
 include <tray.scad>
 
 
-PB_VERSION = "0.0.2";
+PB_VERSION = "0.0.3";
 
 
 // Here are some major parameters:
@@ -92,9 +92,11 @@ inlet_channel_length = inlet_channel_outer_y - inlet_channel_inner_y;
 inlet_channel_center_y = (inlet_channel_inner_y + inlet_channel_outer_y)/2;
 inlet_barb_base_y = boat_y/2;
 
-chamber_height = 15;
-chamber_radius = 15;
-chamber_wall = 3;
+chamber_volume_mm3 = 231000;
+safety_factor = 1.5;
+chamber_radius_mm = 50;
+chamber_height_mm = chamber_volume_mm3*safety_factor/(PI*chamber_radius_mm^2);
+chamber_wall_mm = 2;
 
 module barb(radius, height, barb_depth) {
     rotate_extrude()
@@ -363,13 +365,13 @@ module chamber(gap, d, ww = 2){
 
     difference(){
         translate([chamber_side,0,chimney_height])
-            cylinder(chamber_height,r=chamber_radius);
+            cylinder(chamber_height_mm,r=chamber_radius_mm);
             
-        translate([chamber_side,0,chimney_height+chamber_wall])    
-            cylinder(chamber_height-2*chamber_wall,r=chamber_radius-chamber_wall);
+        translate([chamber_side,0,chimney_height+chamber_wall_mm])    
+            cylinder(chamber_height_mm-2*chamber_wall_mm,r=chamber_radius_mm-chamber_wall_mm);
         
     translate([chamber_side, 0, chimney_height])
-        #cube([chimney_length-ww*2, (gap - ww)-1, 2*chamber_wall], center = true);
+        #cube([chimney_length-ww*2, (gap - ww)-1, 2*chamber_wall_mm], center = true);
   }
 }
 
@@ -425,7 +427,7 @@ if (SHOW_PUMP) {
     if (USE_VERTICAL_KNIFE) {
         difference() {
             completePump();
-            translate([chimney_length,0,chimney_height+30])
+            translate([100,0,chimney_height+30])
             cube([50,50,50],center=true);
         }
     } else {
