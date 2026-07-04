@@ -1,16 +1,9 @@
 # Ferrofluid Pump
 Ferrofluid pump with rotating water blobs and no moving parts
 
-# Our Best Prototype So Far
+A video of best results:
 
-On April 9th, I received this part which has not yet been tested yet:
-
-![IMG_1753](https://github.com/user-attachments/assets/4c24d6c5-acf6-4cf8-a98e-55eebd440ed4)
-
-
-We have a YouTube video of our best prototype so far:
-
-[https://www.youtube.com/shorts/qeiMMLq5IXo](https://www.youtube.com/shorts/qeiMMLq5IXo)
+[https://youtu.be/B2Wuy3dDc4E?si=2YtM-PyZvu_GHdCr](https://youtu.be/B2Wuy3dDc4E?si=2YtM-PyZvu_GHdCr)
 
 # The Latest Version
 
