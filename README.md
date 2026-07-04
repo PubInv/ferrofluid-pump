@@ -53,5 +53,18 @@ We use a hot-melt glue to try to seal the "chamber" so that the fluid will flow 
 
 [https://www.researchgate.net/publication/245883107_Design_fabrication_and_testing_of_fixed-valve_micro-pumps](https://www.researchgate.net/publication/245883107_Design_fabrication_and_testing_of_fixed-valve_micro-pumps)
 
+A closely related paper is:
+article{ando2009ferrofluidic,
+  title={Ferrofluidic pumps: a valuable implementation without moving parts},
+  author={Ando, Bruno and Ascia, Alberto and Baglio, Salvatore and Pitrone, Nicola},
+  journal={IEEE Transactions on Instrumentation and Measurement},
+  volume={58},
+  number={9},
+  pages={3232--3237},
+  year={2009},
+  publisher={IEEE}
+}
+
+
 
 
