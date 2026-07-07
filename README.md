@@ -1,4 +1,11 @@
 # Ferrofluid Pump
+## July 7th
+
+Using Rob's pump with three electromagnets and one permanent magnet at priming, with a 10 amp power supply,
+with a period of 300 ms and {0.0,0.4} interval timing, we measure 8 grams per minute, the best that we have yet.
+
+## Previously
+
 Ferrofluid pump with rotating water blobs and no moving parts
 
 A video of best results:
