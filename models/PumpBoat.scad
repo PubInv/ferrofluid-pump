@@ -43,7 +43,7 @@ magnet_radius = magnet_diameter/2; // radius of magnet cylinders
 gap_width = 6.25; // gap in the magnet
 
 magnet_center_height = magnet_radius;
-number_of_magnets = 3;
+number_of_magnets = 4;
 chute_wall = 2;
 ww = 2; // this is the general wall width
 ramp_height = magnet_radius;
@@ -68,6 +68,8 @@ barb_depth = 2;
 barb_outer_radius = barb_radius + barb_depth;
 
 $fn = 60;
+
+USE_CHAMBER=0;
 
 USE_VERTICAL_KNIFE = 1;
 USE_LID = 0;
@@ -101,7 +103,7 @@ chamber_wall_mm = 2;
 module barb(radius, height, barb_depth) {
     rotate_extrude()
     polygon(points=[
-        [radius, 0],
+        [radius, 0.0],
         [radius + barb_depth, height],
         [radius, height],
         [radius + barb_depth, 2*height],
@@ -110,6 +112,22 @@ module barb(radius, height, barb_depth) {
         [radius, 3*height],
         [radius + barb_depth, 4*height],
         [radius-0.5, 4*height], // Inner wall
+        [radius-0.5, 0]
+    ]);  
+}
+
+module barb1(radius, height, barb_depth) {
+    rotate_extrude()
+    polygon(points=[
+        [radius, 0.0],
+        [radius + barb_depth, height],
+        [radius, height],
+        [radius + barb_depth, 2*height],
+        [radius, 2*height],
+        [radius + barb_depth, 3*height],
+        [radius, 3*height],
+        [radius + barb_depth, 4*height],
+        [radius-0.5, 3.3*height], // Inner wall
         [radius-0.5, 0]
     ]);  
 }
@@ -144,7 +162,7 @@ module boat_lip_outlet_cut() {
 }
 
 module boat() {
-    reservoir_h = 6;
+
     difference() {
         translate([-boat_disp_x,0,0])
         difference() {
@@ -155,16 +173,16 @@ module boat() {
                 boat_lip();
             }
 
-
-            translate([-port_displacement+0.5,0,5.7])
-            cylinder(h = boat_h+1,r = fluid_port_r,center=true);
-
             boat_lip_outlet_cut();
         }
-            // now remove a cylindrical fluid reservoir
-        
+            // now remove a sphere fluid reservoir
+        reservoir_h = 4.5;
+        sphere_mm = 3.3;
         translate([0,0,-reservoir_h/2])
-        cylinder(h = reservoir_h, r = 3.3, center=true);
+        cylinder(h = reservoir_h, r = sphere_mm, center=true);
+        
+        translate([0,0,-sphere_mm])
+        sphere(r = sphere_mm);
     }
 }
 
@@ -231,21 +249,25 @@ module ramp() {
     ramp_height = number_of_magnets*(magnet_radius*2) -magnet_radius;
     echo("ramp_height");
     echo(ramp_height);
-    A = [0,-magnet_fraction];
+    Am = [ magnet_fraction,0 ];
+    A = [0,magnet_fraction/2];
     B = [A[0],ramp_height];
+    w = 1;
+    Bp = [w,ramp_height];
     lock_avoidance_height = magnet_radius*2+1;
-    lock_avoidance_width = magnet_radius+1; 
+    lock_avoidance_width = magnet_radius/2; 
     C = [lock_avoidance_width,lock_avoidance_height];
-    transport_ramp_width = C[0]+magnet_radius;
-    transport_ramp_height = C[1]/2;
+    transport_ramp_width = C[0]+magnet_radius*(1/4);
+    transport_ramp_height = C[1]/3;
     D = [transport_ramp_width,transport_ramp_height];
-    E = [ramp_length,0];
+    E = [ramp_length/2,0];
   
-    color("blue")
-    translate([-ramp_displacement,0,0]) {
+    color("white")
+    translate([1+-(ramp_displacement),0,-1]) 
     rotate([90,0,0])
-        linear_extrude(height=chute_inner_w,center=true)
-        polygon(points = [A,B,C,D,E]);
+    linear_extrude(height=chute_inner_w,center=true)
+    offset(r=0.1) {
+        polygon(points = [Am,A,B,Bp,C,D,E]);
     }
 }
 
@@ -309,11 +331,8 @@ module outlet_ramp(gap, d, ww = 2) {
         cube([chimney_length-ww*2, (gap - ww)-1, chimney_height + 1], center = true);
         // now cut away a port for so the flow can reach the outlet.
         translate([chimney_length/2,0,-chimney_height/2+barb_depth])
-        cube([ww*2,(gap-ww)-1,barb_depth*2],center = true);
-    
-    // cutaway outlet opening.
- //       translate([(d + 2*ww)/2, 0, -chimney_height/2 + 1])
-  //      cube([ww*2+0.1, gap, d], center = true);
+        rotate([0,90,0])       
+        cylinder(h=barb_depth*3,r1=barb_radius*0.8,r2= barb_radius*0.8,center = true);
    }
      
      // lid 
@@ -337,26 +356,48 @@ module chamber(gap, d, ww = 2){
             cylinder(chamber_height_mm-2*chamber_wall_mm,r=chamber_radius_mm-chamber_wall_mm);
         
     translate([chamber_side, 0, chimney_height])
-        #cube([chimney_length-ww*2, (gap - ww)-1, 2*chamber_wall_mm], center = true);
+        cube([chimney_length-ww*2, (gap - ww)-1, 2*chamber_wall_mm], center = true);
   }
+}
+
+module outlet_barb() {
+    /* Outlet */
+    rotate([90,0,-90])
+    translate([0,2,ww*2-(total_barb_length+ramp_length)]) 
+    barb(barb_radius , barb_height, barb_depth);
+    // now we will fill this space to make sure
+    // the outlet port forces the ferfffluid away
+}
+
+module outlet_fill() {
+    h = ramp_length+barb_height*2+3.5;
+    translate([h/2+magnet_diameter-3,0,barb_radius-0.5])
+    difference() {
+        rotate([0,90,0])
+        cylinder(h = h,r = barb_radius,center = true); 
+        translate([0,0,-51])
+        cube([h*2,100,100],center=true);
+        translate([-h/2+3,0,-1])
+        rotate([0,90,0])
+        cylinder(h = magnet_diameter,r1 = barb_radius*2, r2 = 0,center = true); 
+    }
 }
 
 module completePump() {
     pump();
-    chamber(gap_width,magnet_diameter);
+    if (USE_CHAMBER) {
+        chamber(gap_width,magnet_diameter);
+    }
 
     outlet_ramp(gap_width,magnet_diameter);
- //   chimney(gap_width, magnet_diameter);
     magnet_holders();
     /*dx: -7.61078  dy: -4.44922  dz: 0*/
     /* Inlet */
     /* TODO: This needs to be made a module, and 
     all the magic numbers removed */
     inlet_barb();
-    /* Outlet */
-    rotate([90,0,-90])
-    translate([0,2,ww*2-(total_barb_length+ramp_length)]) 
-    barb(barb_radius , barb_height, barb_depth);
+    outlet_barb();
+    outlet_fill();
 }
 module outlet_tray() {
     // This should center us
@@ -397,7 +438,7 @@ if (SHOW_PUMP) {
             cube([200,200,200],center=true);
         }
     } else {
-        completePumpWithTray();
+        completePump();
     }
 }
 
