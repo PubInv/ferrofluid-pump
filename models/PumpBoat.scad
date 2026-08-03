@@ -71,11 +71,11 @@ $fn = 60;
 
 USE_CHAMBER=0;
 
-USE_VERTICAL_KNIFE = 1;
+USE_VERTICAL_KNIFE = 0;
 USE_LID = 0;
 SHOW_PUMP = 1;
-SHOW_INLET = 1;
-SHOW_OUTLET = 1;
+SHOW_INLET_TRAY = 1;
+SHOW_OUTLET_TRAY = 0;
 
 boat_lip_wall = ww;
 boat_lip_height = 2*barb_depth + 1;
@@ -381,6 +381,13 @@ module outlet_fill() {
         rotate([0,90,0])
         cylinder(h = magnet_diameter,r1 = barb_radius*2, r2 = 0,center = true); 
     }
+    A = [0,0];
+    B = [ramp_length/2+0.5,0];
+    C = [ramp_length/2+0.5,barb_radius];
+    translate([ramp_length/3-0.8,0,barb_radius*1.75])
+    #rotate([90,0,0])
+    linear_extrude(height = magnet_diameter,center=true)
+    polygon(points = [A,B,C]);
 }
 
 module completePump() {
@@ -421,11 +428,11 @@ module inlet_tray() {
     }
 }
 
-if (SHOW_OUTLET) {
+if (SHOW_OUTLET_TRAY) {
     translate([43,0,-8])
     outlet_tray();
 }
-if (SHOW_INLET) {
+if (SHOW_INLET_TRAY) {
     translate([0,(boat_y+60)/2 + -0.5,-2])
     inlet_tray();
 }
