@@ -17,7 +17,7 @@
 include <tray.scad>
 
 
-PB_VERSION = "0.0.3";
+PB_VERSION = "0.0.4";
 
 
 // Here are some major parameters:
