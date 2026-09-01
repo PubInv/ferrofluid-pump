@@ -1,4 +1,4 @@
-funnelWidth = 2;
+funnelWidth = 2; //2 or 3 times 6.35 mm, or 1/2 inch
 funnelHeight = 0.5;
 funnelThickness=0.05;
 extrudeHeight = 2;

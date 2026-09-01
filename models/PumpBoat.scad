@@ -17,7 +17,7 @@
 include <tray.scad>
 
 
-PB_VERSION = "0.0.4";
+PB_VERSION = "0.0.5";
 
 
 // Here are some major parameters:
@@ -99,6 +99,11 @@ safety_factor = 1.5;
 chamber_radius_mm = 50;
 chamber_height_mm = chamber_volume_mm3*safety_factor/(PI*chamber_radius_mm^2);
 chamber_wall_mm = 2;
+
+funnelWidth = 2; //2 or 3 times 6.35 mm, or 1/2 inch
+funnelHeight = 0.5;
+funnelThickness=0.05;
+extrudeHeight = 2;
 
 module barb(radius, height, barb_depth) {
     rotate_extrude()
@@ -390,14 +395,71 @@ module outlet_fill() {
     polygon(points = [A,B,C]);
 }
 
+module shearX_Z(s) {
+    multmatrix([
+        [1, 0, s, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0]
+    ])
+    children();
+}
+
+module funnelCupFrame(w,h,t,e){
+    translate([0,0,e/2])
+    linear_extrude(height = e,convexity = 3, scale=4,center=true)
+    difference() {
+        square([w,w],center=true);
+        offset(delta = -t) square([w,w],center=true);
+    }
+}
+
+module funnelOutlet (w,t){
+    translate([-w/2,0,0])
+    rotate([-90,0,0])
+    translate([0,0,-w/2])
+    rotate_extrude(angle=90, convexity=10,$fn=100) 
+    difference() {
+        square([w,w]);
+        offset(delta = -t) square([w,w]);
+    }
+    
+}
+
+module outletPipe(w,t,e){
+    translate([-w/2,0,-w/2])
+    rotate([0,-90,0]) 
+    linear_extrude(height = e, scale = 0.5)
+    difference() {
+        square([w,w],center=true);
+        offset(delta = -t) square([w,w],center=true);
+    }
+}
+
+module funnel() {
+
+shearX_Z(1.5)
+funnelCupFrame(w=funnelWidth,h=funnelHeight,t=funnelThickness, e= extrudeHeight);
+
+funnelOutlet(w=funnelWidth, t=funnelThickness);
+
+outletPipe(w=funnelWidth, t=funnelThickness, e= extrudeHeight);
+
+}
+
+module complete_funnel(){
+    rotate([0, 0, 180])
+    translate([-magnet_radius, 0, -inlet_port_z])
+        funnel();   
+}
+
 module completePump() {
     pump();
     if (USE_CHAMBER) {
         chamber(gap_width,magnet_diameter);
     }
 
-    outlet_ramp(gap_width,magnet_diameter);
-    magnet_holders();
+    //outlet_ramp(gap_width,magnet_diameter);
+    //magnet_holders();
     /*dx: -7.61078  dy: -4.44922  dz: 0*/
     /* Inlet */
     /* TODO: This needs to be made a module, and 
@@ -405,6 +467,7 @@ module completePump() {
     inlet_barb();
     outlet_barb();
     outlet_fill();
+    complete_funnel();
 }
 module outlet_tray() {
     // This should center us
@@ -448,6 +511,7 @@ if (SHOW_PUMP) {
         completePump();
     }
 }
+
 
 
 // completePump();
