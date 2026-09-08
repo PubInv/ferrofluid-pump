@@ -102,7 +102,7 @@ chamber_wall_mm = 2;
 
 funnelWidth = 2; //2 or 3 times 6.35 mm, or 1/2 inch
 funnelHeight = 0.5;
-funnelThickness=0.05;
+funnelThickness=0.2;
 extrudeHeight = 2;
 
 module barb(radius, height, barb_depth) {
@@ -296,8 +296,8 @@ module pump() {
         boat();
         inlet_channel_cut();
     }
-    chute();
-    ramp();
+//    chute();
+//    ramp();
 }
 
 
@@ -367,6 +367,7 @@ module chamber(gap, d, ww = 2){
 
 module outlet_barb() {
     /* Outlet */
+    translate([7,0,0])
     rotate([90,0,-90])
     translate([0,2,ww*2-(total_barb_length+ramp_length)]) 
     barb(barb_radius , barb_height, barb_depth);
@@ -406,7 +407,9 @@ module shearX_Z(s) {
 
 module funnelCupFrame(w,h,t,e){
     translate([0,0,e/2])
-    linear_extrude(height = e,convexity = 3, scale=4,center=true)
+    linear_extrude(height = e,convexity = 3, 
+            scale=3,
+            center=true)
     difference() {
         square([w,w],center=true);
         offset(delta = -t) square([w,w],center=true);
@@ -424,7 +427,7 @@ module funnelOutlet (w,t){
     }
     
 }
-
+// TODO: Change to a cone
 module outletPipe(w,t,e){
     translate([-w/2,0,-w/2])
     rotate([0,-90,0]) 
@@ -436,14 +439,15 @@ module outletPipe(w,t,e){
 }
 
 module funnel() {
+    scale([3,3,3])
+    union() {
+        shearX_Z(1.2)
+        funnelCupFrame(w=funnelWidth,h=funnelHeight,t=      funnelThickness, e= extrudeHeight);
 
-shearX_Z(1.5)
-funnelCupFrame(w=funnelWidth,h=funnelHeight,t=funnelThickness, e= extrudeHeight);
+        funnelOutlet(w=funnelWidth, t=funnelThickness);
 
-funnelOutlet(w=funnelWidth, t=funnelThickness);
-
-outletPipe(w=funnelWidth, t=funnelThickness, e= extrudeHeight);
-
+        #outletPipe(w=funnelWidth, t=funnelThickness, e=     extrudeHeight);
+    }
 }
 
 module complete_funnel(){
@@ -466,7 +470,8 @@ module completePump() {
     all the magic numbers removed */
     inlet_barb();
     outlet_barb();
-    outlet_fill();
+//    outlet_fill();
+    translate([10,0,0])
     complete_funnel();
 }
 module outlet_tray() {
