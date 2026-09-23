@@ -30,7 +30,7 @@ echo(neutral_buoyancy_volume_cm3);
 adjusted_buoyancy_volume_cm3 = neutral_buoyancy_volume_cm3*1.25;
 boat_w = 60;
 
-boat_y = 50;
+boat_y = 80;
 boat_w_cm = boat_w/10;
 boat_y_cm = boat_y/10;
 boat_area_cm2 = boat_w_cm*boat_y_cm;
@@ -103,6 +103,7 @@ chamber_wall_mm = 2;
 funnelWidth = 2; //2 or 3 times 6.35 mm, or 1/2 inch
 funnelHeight = 0.5;
 funnelThickness=0.2;
+funnelOutletThickness=0.5;
 extrudeHeight = 2;
 
 module barb(radius, height, barb_depth) {
@@ -428,13 +429,57 @@ module funnelOutlet (w,t){
     
 }
 // TODO: Change to a cone
-module outletPipe(w,t,e){
+module outletPipe(funnelWidth,funnelThickness,length,outlet_radius){
+    w = funnelWidth;
+    t = funnelThickness;
+    e = length;
+    or = outlet_radius;
+
+    outlet_radius = or;
     translate([-w/2,0,-w/2])
-    rotate([0,-90,0]) 
-    linear_extrude(height = e, scale = 0.5)
+    
+//    rotate([0,-90,0]) 
+//    linear_extrude(height = e, scale = 0.5)
+//    difference() {
+//        square([w,w],center=true);
+//        offset(delta = -t) square([w,w],center=true);
+//    }
+    
+        
+        rotate([0,-90,0])
+transition(L=e,
+                  square_outer=funnelWidth,
+                  square_inner=funnelWidth-funnelThickness,
+                  round_outer=or/2+funnelThickness,
+                  round_inner=or/2);
+}
+
+module transition(L=40,
+                  square_outer=30,
+                  square_inner=26,
+                  round_outer=30,
+                  round_inner=26) {
+
     difference() {
-        square([w,w],center=true);
-        offset(delta = -t) square([w,w],center=true);
+
+        // outer surface
+        hull() {
+            linear_extrude(0.01)
+                square([square_outer, square_outer], center=true);
+
+            translate([0,0,L])
+                cylinder(h=0.01, d=round_outer, $fn=64);
+        }
+
+        // inner passage
+        translate([0,0,-0.1])
+        hull() {
+            linear_extrude(0.01)
+                square([square_inner, square_inner], center=true);
+
+            translate([0,0,L])
+                cylinder(h=0.3, d=round_inner, $fn=64);
+        }
     }
 }
 
@@ -446,7 +491,9 @@ module funnel() {
 
         funnelOutlet(w=funnelWidth, t=funnelThickness);
 
-        #outletPipe(w=funnelWidth, t=funnelThickness, e=     extrudeHeight);
+        translate([0,0,0.15])
+        outletPipe(funnelWidth=funnelWidth, funnelThickness=funnelOutletThickness, length= 1.6,barb_radius);   
+        
     }
 }
 
@@ -486,7 +533,7 @@ module outlet_tray() {
 module inlet_tray() {
     x = 40;
     y = 60;
-    z = 25;
+    z = 30;
     translate([-x/2,-y/2,-barb_outer_radius*2-1])
     difference() {
         tray([x,y,z], thickness=2, bottom_thickness=2);
@@ -520,3 +567,5 @@ if (SHOW_PUMP) {
 
 
 // completePump();
+
+
