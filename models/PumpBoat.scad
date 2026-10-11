@@ -368,7 +368,7 @@ module chamber(gap, d, ww = 2){
 
 module outlet_barb() {
     /* Outlet */
-    translate([7,0,0])
+    translate([7+magnet_diameter,0,0])
     rotate([90,0,-90])
     translate([0,2,ww*2-(total_barb_length+ramp_length)]) 
     barb(barb_radius , barb_height, barb_depth);
@@ -484,10 +484,11 @@ module transition(L=40,
 }
 
 module funnel() {
-    scale([3,3,3])
-    union() {
-        shearX_Z(1.2)
-        funnelCupFrame(w=funnelWidth,h=funnelHeight,t=      funnelThickness, e= extrudeHeight);
+    translate([-magnet_diameter, 0, 0])
+        scale([3,3,3])
+        union() {
+            shearX_Z(1.2)
+            funnelCupFrame(w=funnelWidth,h=     funnelHeight,t=      funnelThickness, e= extrudeHeight);
 
         funnelOutlet(w=funnelWidth, t=funnelThickness);
 
