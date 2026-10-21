@@ -72,6 +72,7 @@ $fn = 60;
 USE_CHAMBER=0;
 
 USE_VERTICAL_KNIFE = 0;
+USE_HORIZONTAL_KNIFE = 0;
 USE_LID = 0;
 SHOW_PUMP = 1;
 SHOW_INLET_TRAY = 1;
@@ -85,7 +86,8 @@ boat_lip_outlet_cut_w = max(
     boat_lip_outlet_flow_w,
     gap_width - 2*boat_lip_outlet_overlap
 );
-inlet_port_x = 0;
+// inlet_port_x = 0;
+inlet_port_x = -gap_width;
 inlet_barb_floor_clearance = 3;
 inlet_port_z = -boat_h + inlet_barb_floor_clearance + barb_outer_radius;
 inlet_channel_inner_y = 0;
@@ -178,17 +180,21 @@ module boat() {
 
                 boat_lip();
             }
-
+            translate([-gap_width,0,0])   
             boat_lip_outlet_cut();
         }
             // now remove a sphere fluid reservoir
+
         reservoir_h = 4.5;
         sphere_mm = 3.3;
-        translate([0,0,-reservoir_h/2])
-        cylinder(h = reservoir_h, r = sphere_mm, center=true);
+        translate([-gap_width,0,0])
+        union() {
+            translate([0,0,-reservoir_h/2])
+            cylinder(h = reservoir_h, r = sphere_mm, center=true);
         
-        translate([0,0,-sphere_mm])
-        sphere(r = sphere_mm);
+            translate([0,0,-sphere_mm])
+            sphere(r = sphere_mm);
+        }
     }
 }
 
@@ -549,15 +555,23 @@ if (SHOW_OUTLET_TRAY) {
     outlet_tray();
 }
 if (SHOW_INLET_TRAY) {
-    translate([0,(boat_y+60)/2 + -0.5,-2])
+    translate([-gap_width,(boat_y+60)/2 + -0.5,-2])
     inlet_tray();
 }
+
+
 
 if (SHOW_PUMP) {
     if (USE_VERTICAL_KNIFE) {
         difference() {
             completePump();
             translate([0,-100,0])
+            cube([200,200,200],center=true);
+        }
+    } else if (USE_HORIZONTAL_KNIFE) {
+        difference() {
+            completePump();
+            translate([0,0,95])
             cube([200,200,200],center=true);
         }
     } else {
