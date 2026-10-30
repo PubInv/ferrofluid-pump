@@ -378,8 +378,14 @@ module outlet_barb() {
     rotate([90,0,-90])
     translate([0,2,ww*2-(total_barb_length+ramp_length)]) 
     barb(barb_radius , barb_height, barb_depth);
-    // now we will fill this space to make sure
-    // the outlet port forces the ferfffluid away
+}
+
+module outlet_barb_core() {
+    /* Outlet */
+    translate([7+magnet_diameter,0,0])
+    rotate([90,0,-90])
+    translate([0,2,ww*2-(total_barb_length+ramp_length)]) 
+    cylinder(h = barb_height*4,r = barb_radius);
 }
 
 module outlet_fill() {
@@ -398,7 +404,7 @@ module outlet_fill() {
     B = [ramp_length/2+0.5,0];
     C = [ramp_length/2+0.5,barb_radius];
     translate([ramp_length/3-0.8,0,barb_radius*1.75])
-    #rotate([90,0,0])
+    rotate([90,0,0])
     linear_extrude(height = magnet_diameter,center=true)
     polygon(points = [A,B,C]);
 }
@@ -493,6 +499,7 @@ module funnel() {
     translate([-magnet_diameter, 0, 0])
         scale([3,3,3])
         union() {
+            translate([-0.08,0,-0.1])
             shearX_Z(1.2)
             funnelCupFrame(w=funnelWidth,h=     funnelHeight,t=      funnelThickness, e= extrudeHeight);
 
@@ -511,22 +518,28 @@ module complete_funnel(){
 }
 
 module completePump() {
-    pump();
-    if (USE_CHAMBER) {
-        chamber(gap_width,magnet_diameter);
-    }
+    difference() {
+        union() {
+            pump();
+            if (USE_CHAMBER) {
+                chamber(gap_width,magnet_diameter);
+            }
 
-    //outlet_ramp(gap_width,magnet_diameter);
-    //magnet_holders();
-    /*dx: -7.61078  dy: -4.44922  dz: 0*/
-    /* Inlet */
-    /* TODO: This needs to be made a module, and 
-    all the magic numbers removed */
-    inlet_barb();
-    outlet_barb();
-//    outlet_fill();
-    translate([10,0,0])
-    complete_funnel();
+            //outlet_ramp(gap_width,magnet_diameter);
+            //magnet_holders();
+            /*dx: -7.61078  dy: -4.44922  dz: 0*/
+            /* Inlet */
+            /* TODO: This needs to be made a module, and 
+            all the magic numbers removed */
+            inlet_barb();
+            outlet_barb();
+        //    outlet_fill();
+            translate([10,0,0])
+            complete_funnel();
+        }
+        translate([-7.6,0,0])
+        outlet_barb_core();
+    }
 }
 module outlet_tray() {
     // This should center us
